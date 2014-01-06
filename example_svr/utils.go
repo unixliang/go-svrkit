@@ -5,7 +5,6 @@ import (
 	"net"
 )
 
-
 func Init(ip string, listenPortBase int) error {
 	var err error
 
@@ -16,7 +15,6 @@ func Init(ip string, listenPortBase int) error {
 
 	return nil
 }
-
 
 func CreateUdpConn(addrStr string) (*net.UDPConn, error) {
 	addr, err := net.ResolveUDPAddr("udp", addrStr)

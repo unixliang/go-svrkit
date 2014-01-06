@@ -7,7 +7,6 @@ import (
 	"net"
 )
 
-
 func RunLogic(req []byte, fromAddr *net.UDPAddr) {
 	defer func() {
 		if err := recover(); err != nil {

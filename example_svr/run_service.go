@@ -7,6 +7,48 @@ import (
 	"time"
 )
 
+func init() {
+	go RunSeqAlloc()
+	//send
+	go func() {
+		for {
+			func() {
+				defer func() {
+					if err := recover(); err != nil {
+						fmt.Println(err)
+					}
+				}()
+				for {
+					ctx := <-send
+					packFunc := reflect.ValueOf(&pack).MethodByName(ctx.ServiceName)
+					if !packFunc.IsValid() {
+						err := fmt.Errorf("no method name pack.%v", ctx.ServiceName)
+						fmt.Println(err)
+						continue
+					}
+					res := packFunc.Call([]reflect.Value{reflect.ValueOf(ctx.Seq), reflect.ValueOf(ctx.In)})
+					if !res[1].IsNil() {
+						err := res[1].Interface().(error)
+						fmt.Println(err)
+						continue
+					}
+					req := res[0].Interface().([]byte)
+					conn := mpConn[ctx.ServiceName]
+					if conn == nil {
+						err := fmt.Errorf("mpConn[%v] not exist", ctx.ServiceName)
+						fmt.Println(err)
+						panic(err)
+					}
+					_, err := conn.WriteToUDP(req, ctx.Addr)
+					if err != nil {
+						fmt.Println(err)
+						continue
+					}
+				}
+			}()
+		}
+	}()
+}
 
 func RunSeqAlloc() {
 	var seq uint32
@@ -85,53 +127,8 @@ func RegisterService(serviceName string) error {
 		}
 	}()
 
-	if !haveRegistered {
-		haveRegistered = true
-
-		go RunSeqAlloc()
-		//send
-		go func() {
-			for {
-				func() {
-					defer func() {
-						if err := recover(); err != nil {
-							fmt.Println(err)
-						}
-					}()
-					for {
-						ctx := <-send
-						packFunc := reflect.ValueOf(&pack).MethodByName(ctx.ServiceName)
-						if !packFunc.IsValid() {
-							err := fmt.Errorf("no method name pack.%v", serviceName)
-							fmt.Println(err)
-							continue
-						}
-						res := packFunc.Call([]reflect.Value{reflect.ValueOf(ctx.Seq), reflect.ValueOf(ctx.In)})
-						if !res[1].IsNil() {
-							err = res[1].Interface().(error)
-							fmt.Println(err)
-							continue
-						}
-						req := res[0].Interface().([]byte)
-						conn := mpConn[ctx.ServiceName]
-						if conn == nil {
-							err := fmt.Errorf("mpConn[%v] not exist", ctx.ServiceName)
-							fmt.Println(err)
-							panic(err)
-						}
-						_, err = conn.WriteToUDP(req, ctx.Addr)
-						if err != nil {
-							fmt.Println(err)
-							continue
-						}
-					}
-				}()
-			}
-		}()
-	}
 	return nil
 }
-
 
 func RunService(serviceName string, addr *net.UDPAddr, in interface{}, timeoutMs int) (interface{}, error) {
 	seq := <-seqAlloc
@@ -146,7 +143,7 @@ func RunService(serviceName string, addr *net.UDPAddr, in interface{}, timeoutMs
 		ctxs_m[seq].Lock()
 		ctxs[seq] = nil
 		ctxs_m[seq].Unlock()
-	} ()
+	}()
 
 	ctx.ServiceName = serviceName
 	ctx.Seq = seq
