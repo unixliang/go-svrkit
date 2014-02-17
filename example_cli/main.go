@@ -7,7 +7,7 @@ import(
 		"encoding/binary"
 	  )
 
-func main() {
+func do() {
 	var sum uint32
 
 	bs := make([]byte, 128)
@@ -39,4 +39,8 @@ func main() {
 		binary.Read(p, binary.BigEndian, &sum)
 		fmt.Println("recv: sum = ", sum)
 	}
+}
+
+func main() {
+	do()
 }

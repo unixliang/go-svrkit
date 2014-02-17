@@ -25,7 +25,7 @@ func RunLogic(req []byte, fromAddr *net.UDPAddr) {
 	addIn.A = A
 	addIn.B = B
 
-	addr, err := net.ResolveUDPAddr("udp", "127.0.0.1:4000")
+	addr, err := net.ResolveUDPAddr("udp", "127.0.0.1:3001")
 
 	res, err := RunService("Add", addr, &addIn, 1000)
 	if err != nil {
@@ -46,13 +46,14 @@ func RunLogic(req []byte, fromAddr *net.UDPAddr) {
 }
 
 func main() {
+	var err error
 
-	err := Init("127.0.0.1", 3000)
+	err = RegisterService("Add")
 	if err != nil {
 		panic(err)
 	}
 
-	err = RegisterService("Add")
+	err = Init("127.0.0.1", 3000)
 	if err != nil {
 		panic(err)
 	}

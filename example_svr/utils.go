@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"net"
+	"runtime"
 )
 
 func Init(ip string, listenPortBase int) error {
@@ -12,6 +13,8 @@ func Init(ip string, listenPortBase int) error {
 	if err != nil {
 		return err
 	}
+
+	runtime.GOMAXPROCS(4)
 
 	return nil
 }
