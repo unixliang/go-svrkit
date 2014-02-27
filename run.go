@@ -1,17 +1,17 @@
 package go_udp_svrkit
 
 import (
-	"runtime"
 	"fmt"
+	"runtime"
 	"sync"
-	)
+)
 
 func Run(maxProcs int) {
 
 	runtime.GOMAXPROCS(maxProcs)
-	
+
 	var wg sync.WaitGroup
-	
+
 	for _, local := range liLocal {
 		wg.Add(1)
 		go func() {
@@ -30,7 +30,7 @@ func Run(maxProcs int) {
 				req := bytes[0:n]
 				go local.Logic(local.Conn, req, addr)
 			}
-		} ()
+		}()
 	}
 	wg.Wait()
 }

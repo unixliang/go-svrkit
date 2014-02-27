@@ -4,7 +4,7 @@ package main
 import (
 		"testing"
 		"net"
-		"fmt"
+		_ "fmt"
 		"bytes"
 		"encoding/binary"
 	   )

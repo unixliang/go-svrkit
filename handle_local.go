@@ -1,17 +1,15 @@
 package go_udp_svrkit
 
-
 import (
 	"fmt"
 	"net"
 )
 
-
 func RegisterLocal(addrStr string,
-		logic func(*net.UDPConn, []byte, *net.UDPAddr))  error {
+	logic func(*net.UDPConn, []byte, *net.UDPAddr)) error {
 
 	if logic == nil {
-		return fmt.Errorf("logic is nil");
+		return fmt.Errorf("logic is nil")
 	}
 
 	addr, err := net.ResolveUDPAddr("udp", addrStr)

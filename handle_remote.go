@@ -50,12 +50,16 @@ func RunSeqAlloc() {
 	}
 }
 
-func RegisterRemote(remoteName string, 
-		packReq func(uint32, interface{}) ([]byte, error), 
-		unpackRsp func([]byte) (uint32, interface{}, error)) error {
+func RegisterRemote(remoteName string,
+	packReq func(uint32, interface{}) ([]byte, error),
+	unpackRsp func([]byte) (uint32, interface{}, error)) error {
 
 	if packReq == nil {
-		return fmt.Errorf("packReq is nil");
+		return fmt.Errorf("packReq is nil")
+	}
+
+	if unpackRsp == nil {
+		return fmt.Errorf("unpackRsp is nil")
 	}
 
 	addr, err := net.ResolveUDPAddr("udp", "0.0.0.0:0")
@@ -66,7 +70,7 @@ func RegisterRemote(remoteName string,
 	if err != nil {
 		return err
 	}
-	remote :=  new(Remote_t)
+	remote := new(Remote_t)
 	remote.Conn = conn
 	remote.PackReq = packReq
 	remote.UnpackRsp = unpackRsp
@@ -91,7 +95,7 @@ func RegisterRemote(remoteName string,
 					rsp := bytes[0:n]
 
 					if unpackRsp == nil {
-						continue;
+						continue
 					}
 
 					seq, out, err := unpackRsp(rsp)
@@ -122,7 +126,7 @@ func RunRemote(remoteName string, addr *net.UDPAddr, in interface{}, timeoutMs i
 
 	remote := mpRemotes[remoteName]
 	if remote == nil {
-		return nil, fmt.Errorf("mpRemotes[%v] not exise.", remote);
+		return nil, fmt.Errorf("mpRemotes[%v] not exise.", remote)
 	}
 
 	seq := <-seqAlloc
@@ -138,7 +142,6 @@ func RunRemote(remoteName string, addr *net.UDPAddr, in interface{}, timeoutMs i
 		ctxs[seq] = nil
 		ctxs_m[seq].Unlock()
 	}()
-
 
 	ctx.Remote = remote
 	ctx.Seq = seq
