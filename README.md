@@ -9,3 +9,5 @@ to create a service communicated with others, generally focus on 3 points belows
 go_udp_svrkit is a udp framework separate what mentioned above into corresponded 3 part memtioned above.
 
 see detail in example/svr
+or try a bench test: 
+go test -test.bench=".*"
