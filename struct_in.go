@@ -1,4 +1,4 @@
-package go_udp_svrkit
+package svrkit
 
 import (
 	"net"
@@ -6,7 +6,7 @@ import (
 
 type Local_t struct {
 	Conn  *net.UDPConn
-	Logic func(*net.UDPConn, []byte, *net.UDPAddr)
+	Logic func(uint32, *net.UDPConn, []byte, *net.UDPAddr)
 }
 
 type Remote_t struct {

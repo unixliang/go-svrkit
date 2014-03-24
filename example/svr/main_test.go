@@ -4,7 +4,7 @@ package main
 import (
 		"testing"
 		"net"
-		_ "fmt"
+		"fmt"
 		"bytes"
 		"encoding/binary"
 	   )
@@ -30,7 +30,6 @@ func Benchmark_Add(b *testing.B) {
 		binary.Write(p, binary.BigEndian, uint32(i))
 		binary.Write(p, binary.BigEndian, uint32(i + 1))
 
-		//fmt.Println("send: ", i, " + ", i + 1, " = ")
 
 		_, err = conn.WriteToUDP(p.Bytes(), addr)
 		if err != nil {
@@ -43,6 +42,7 @@ func Benchmark_Add(b *testing.B) {
 		}
 		p = bytes.NewBuffer(bs[0 : n])
 		binary.Read(p, binary.BigEndian, &sum)
-		//fmt.Println("recv: sum = ", sum)
+
+		fmt.Println(i, " + ", i + 1, " = ", sum)
 	}
 }

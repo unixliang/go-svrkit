@@ -1,11 +1,11 @@
-package go_udp_svrkit
+package svrkit
 
 import (
 	"sync"
 )
 
 const (
-	MAX_PKG_LEN = 10000
+	MAX_PKG_LEN = 100000
 	CTXS_SIZE   = 1048575 //2^20 - 1
 )
 

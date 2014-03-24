@@ -1,4 +1,4 @@
-package go_udp_svrkit
+package svrkit
 
 import (
 	"fmt"
@@ -6,7 +6,9 @@ import (
 	"sync"
 )
 
-func Run(maxProcs int) {
+func Run(maxProcs int, logPrefix string, logPriority int) {
+
+	NewLogger(logPrefix, logPriority)
 
 	runtime.GOMAXPROCS(maxProcs)
 
@@ -20,15 +22,17 @@ func Run(maxProcs int) {
 					fmt.Println(err)
 				}
 			}()
-			bytes := make([]byte, MAX_PKG_LEN)
 			for {
+				bytes := make([]byte, MAX_PKG_LEN)
 				n, addr, err := local.Conn.ReadFromUDP(bytes)
 				if err != nil {
 					panic(err)
 				}
 
+				seq := <-seqAlloc
+
 				req := bytes[0:n]
-				go local.Logic(local.Conn, req, addr)
+				go local.Logic(seq, local.Conn, req, addr)
 			}
 		}()
 	}

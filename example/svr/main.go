@@ -5,12 +5,12 @@ import (
 	"encoding/binary"
 	"fmt"
 	"net"
-	svr "go_udp_svrkit"
+	svrkit "go-svrkit"
 
 )
 
 
-func Logic(conn *net.UDPConn, req []byte, fromAddr *net.UDPAddr) {
+func Logic(seq uint32, conn *net.UDPConn, req []byte, fromAddr *net.UDPAddr) {
 	defer func() {
 		if err := recover(); err != nil {
 			fmt.Print(err)
@@ -30,12 +30,14 @@ func Logic(conn *net.UDPConn, req []byte, fromAddr *net.UDPAddr) {
 
 	addr, err := net.ResolveUDPAddr("udp", "127.0.0.1:3001")
 
-	res, err := svr.RunRemote("Add", addr, &addIn, 1000)
+	res, err := svrkit.RunRemote(seq, "Add", addr, &addIn, 1000)
 	if err != nil {
 		panic(fmt.Errorf("Add err: %v", err))
 	}
 
 	addOut := res.(*AddOut)
+
+	svrkit.Infof("seq: %v a: %v b: %v sum: %v", seq, addIn.A, addIn.B, addOut.Sum)
 
 	p = new(bytes.Buffer)
 	binary.Write(p, binary.BigEndian, addOut.Sum)
@@ -51,17 +53,17 @@ func Logic(conn *net.UDPConn, req []byte, fromAddr *net.UDPAddr) {
 func main() {
 	var err error
 
-	err = svr.RegisterRemote("Add", PackAddReq, UnpackAddRsp)
+	err = svrkit.RegisterRemote("Add", PackAddReq, UnpackAddRsp)
 	if err != nil {
 		panic(err)
 	}
 
-	err = svr.RegisterLocal("127.0.0.1:3000", Logic)
+	err = svrkit.RegisterLocal("127.0.0.1:3000", Logic)
 	if err != nil {
 		panic(err)
 	}
 
-	svr.Run(10)
+	svrkit.Run(10, "./svr", 7)
 
 	return
 

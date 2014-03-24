@@ -1,4 +1,4 @@
-package go_udp_svrkit
+package svrkit
 
 import (
 	"fmt"
@@ -6,7 +6,7 @@ import (
 )
 
 func RegisterLocal(addrStr string,
-	logic func(*net.UDPConn, []byte, *net.UDPAddr)) error {
+	logic func(uint32, *net.UDPConn, []byte, *net.UDPAddr)) error {
 
 	if logic == nil {
 		return fmt.Errorf("logic is nil")
